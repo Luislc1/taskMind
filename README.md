@@ -1,60 +1,64 @@
-# 🧠 TaskMind AI
+# TaskMind
 
-> Gerenciador inteligente de tarefas com LLM como copiloto de produtividade.
+> Gerenciador inteligente de tarefas com IA (Gemini) como copiloto de produtividade.
 
 **Projeto Final de Disciplina** — implementação funcional combinando
-**LLM + API + Persistência + Interface Web**.
+**IA + API FastAPI + Persistência + Frontend Web Premium**.
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 | Recurso | Descrição |
 | --- | --- |
-| ➕ **CRUD de tarefas** | Cria, lista, atualiza e exclui tarefas com prazo, prioridade e status |
-| 🤖 **Decomposição com IA** | A LLM quebra uma tarefa grande em 3-8 subtarefas executáveis |
-| ⏱️ **Estimativa de tempo** | A LLM estima quantos minutos cada tarefa exige |
-| 📊 **Priorização inteligente** | A LLM atribui um score 0-100 com justificativa baseada em prazo, esforço e urgência |
-| 💬 **Chat contextual** | Converse com a IA — ela conhece todas as suas tarefas |
-| 📈 **Relatório semanal** | A LLM gera análise de produtividade com recomendações |
-| 📉 **Dashboard** | Gráficos interativos de status, prioridade e prazos |
+| **CRUD de tarefas** | Cria, lista, atualiza e exclui tarefas com prazo, prioridade e status |
+| **Decomposição com IA** | O modelo quebra uma tarefa grande em 3-8 subtarefas executáveis |
+| **Estimativa de tempo** | O modelo estima quantos minutos cada tarefa exige |
+| **Priorização inteligente** | O modelo atribui um score 0-100 com justificativa baseada em prazo, esforço e urgência |
+| **Chat contextual** | Converse com a IA — ela conhece todas as suas tarefas |
+| **Relatório semanal** | A IA gera análise de produtividade com recomendações |
+| **Dashboard** | Visão geral limpa com as estatísticas de uso (pendentes, concluídas, etc.) |
 
 ---
 
-## 🛠️ Stack técnica
+## Stack técnica
 
 | Camada | Tecnologia |
 | --- | --- |
-| Interface Web | [Streamlit](https://streamlit.io/) |
-| LLM (API) | [Anthropic Claude](https://www.anthropic.com/api) |
-| ORM / Persistência | [SQLAlchemy](https://www.sqlalchemy.org/) + SQLite |
-| Visualização | [Plotly Express](https://plotly.com/python/plotly-express/) |
-| Configuração | [python-dotenv](https://pypi.org/project/python-dotenv/) |
+| Frontend Web | **HTML5, CSS3 (Vanilla), JavaScript** (Design Premium SPA) |
+| Backend API | **FastAPI** + Uvicorn |
+| LLM (API) | **Google Gemini** (gemini-2.5-flash) |
+| ORM / Persistência | **SQLAlchemy** + SQLite |
+| Configuração | **python-dotenv** |
 
 ---
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 taskmind-ai/
-├── app.py              # Interface Streamlit (entrypoint)
+├── main.py             # Servidor Backend (FastAPI) e rotas
 ├── database.py         # Modelos ORM e operações CRUD
-├── llm_service.py      # Integração com a API do Claude
+├── llm_service.py      # Integração com a API do Google Gemini
 ├── requirements.txt    # Dependências Python
 ├── .env.example        # Modelo de variáveis de ambiente
 ├── README.md           # Este arquivo
-├── DOCUMENTACAO.pdf    # Documento de entrega
+├── DOCUMENTACAO.pdf    # Documento original de entrega
+├── static/             # Frontend
+│   ├── index.html      # Estrutura HTML SPA
+│   ├── style.css       # Design System Premium Customizado
+│   └── app.js          # Lógica de interface e chamadas para API
 └── data/
     └── taskmind.db     # SQLite (criado automaticamente no 1º uso)
 ```
 
 ---
 
-## 🚀 Como executar
+## Como executar
 
 ### 1. Pré-requisitos
 - Python 3.10+
-- Conta na [Anthropic Console](https://console.anthropic.com/) com uma API key
+- Conta no [Google AI Studio](https://aistudio.google.com/) com uma API key
 
 ### 2. Instalação
 ```bash
@@ -73,22 +77,22 @@ pip install -r requirements.txt
 ### 3. Configuração
 ```bash
 cp .env.example .env
-# Edite o arquivo .env e coloque sua chave da API:
-# ANTHROPIC_API_KEY=sk-ant-...
+# Edite o arquivo .env e coloque sua chave da API do Google:
+# GEMINI_API_KEY=sua-chave-aqui
 ```
 
 ### 4. Execução
 ```bash
-streamlit run app.py
+uvicorn main:app --reload
 ```
-A aplicação abrirá em `http://localhost:8501`.
+A aplicação abrirá no endereço padrão: `http://localhost:8000` (ou `http://127.0.0.1:8000`).
 
 ---
 
-## 🧠 Como a IA é usada
+## Como a IA é usada
 
 O arquivo `llm_service.py` concentra **cinco funções principais** que
-consomem a API do Claude:
+consomem a API do Google Gemini (`gemini-2.5-flash`):
 
 1. **`decompose_task(title, description)`** → retorna lista de subtarefas
    acionáveis, obrigando resposta em JSON.
@@ -97,17 +101,17 @@ consomem a API do Claude:
    devolve scores 0-100 com justificativa, considerando prazos e
    estimativas.
 4. **`chat_about_tasks(message, tasks, history)`** → chat com **contexto
-   injetado** (tarefas atuais + histórico recente) no system prompt.
+   injetado** (tarefas atuais + histórico recente) no system_instruction.
 5. **`generate_productivity_report(tasks)`** → gera relatório em
    Markdown com resumo, destaques, pontos de atenção e recomendações.
 
 Todas as respostas que precisam ser estruturadas usam **JSON forçado via
-system prompt**, com função `_extract_json()` tolerante a formatos
+instrução de sistema**, com função `_extract_json()` tolerante a formatos
 imperfeitos (remove cercas de markdown, tenta fallback).
 
 ---
 
-## 💾 Modelo de dados
+## Modelo de dados
 
 ```text
 Task (1) ─── (N) Subtask
@@ -131,6 +135,6 @@ ChatMessage
 
 ---
 
-## 📝 Licença
+## Licença
 
 Projeto acadêmico — uso livre para fins educacionais.
